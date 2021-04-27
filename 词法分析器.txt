@@ -1,0 +1,261 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <iostream>
+using namespace std;
+typedef struct node
+{
+    int typecode;
+    char key[20];
+}stu[11];
+
+int Letter(char ch)
+{
+    if ((ch >= 65 && ch <= 90) || (ch >= 97 && ch <= 122))
+    {
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
+int num(char ch)
+{
+    if (ch >= 48 && ch <= 57)
+    {
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
+void Lexicalanalysis(char a[])
+{
+        struct node stu[11] = { {3,"void"} ,{4,"int"},{5,"float"},{6,"char"},{7,"if"},{8,"else"},{9,"while"},{10,"do"},{11,"for"},{12,"return"},{13,"main"} };
+        int i = 0,flag=0;
+        int Line = 1;
+        int ErrorLine[100],Error=0;
+        char ch, stringbuffer[100];
+        int number=i;
+	int length = 11;
+	int j = 0;
+	while ((ch = a[j]) != '#')
+	{
+		if (ch == ' ' || ch == '\t')
+		{
+			j++;
+		}
+		else if (ch == '\n')
+		{
+			if (j != 0 && a[j - 1] != '\n')
+			{
+				printf("\n");
+				Line++;
+			}
+			j++;
+		}
+		else if (ch == '/' && a[j + 1] == '/')
+		{
+			do
+			{
+				j++;
+			} while (a[j] != '\n');
+
+		}
+		else if (ch == '/'&&a[j + 1] == '*')
+		{
+		        j++;
+		        for(;;)
+                        {
+                                j++;
+                                if(a[j]=='*'&&a[j+1]=='/')
+                                {
+                                        j+=2;
+                                        break;
+                                }
+                                if(j==number-1)
+                                {
+                                ErrorLine[Error] = Line;
+				Error++;
+				printf("LexicalError,\n");
+				break;
+                                }
+                        }
+
+			if (a[j] == '\n')
+			{
+				j++;
+			}
+		}
+		else if (num(ch))
+		{
+			while (num(ch))
+			{
+				stringbuffer[i] = ch;
+				i++;
+				j++;
+				ch = a[j];
+			}
+			if (Letter(ch))
+			{
+				ErrorLine[Error] = Line;
+				Error++;
+				printf("LexicalError,");
+				j++;
+				ch = a[j];
+				while (Letter(ch) == 1 || num(ch) == 1)
+				{
+					j++;
+					ch = a[j];
+				}
+				i--;
+			}
+			else
+			{
+				stringbuffer[i] = '\0';
+
+				printf("<2,%s>,",stringbuffer);
+
+			}
+		}
+		else if (Letter(ch))
+		{
+			i = 0;
+			while (Letter(ch) || num(ch))
+			{
+				stringbuffer[i] = ch;
+				i++;
+				j++;
+				ch = a[j];
+			}
+			stringbuffer[i] = '\0';
+			i = 0;
+                        int k = 0;
+                for (k = 0; k < length; k++)
+                {
+                    if (strcmp(stringbuffer, stu[k].key) == 0)
+                    {
+                        printf("<%d,->,", stu[k].typecode);
+                        i=0;
+                        flag=1;
+                    }
+                }
+			if(flag==0)
+			{
+
+				printf("<1,%s>,", stringbuffer);
+				i=0;
+			}
+			flag=0;
+		}
+		else if (a[j + 1] == '=')
+		{
+			if (ch == '<')
+			{
+				printf("<20,->,");
+				j += 2;
+			}
+			else if (ch == '>')
+			{
+				printf("<22,->,");
+				j += 2;
+			}
+			else if (ch == '=')
+			{
+				printf("<23,->,");
+				j += 2;
+			}
+			else if (ch == '!')
+			{
+				printf("<24,->,");
+				j += 2;
+			}
+		}
+		else if (ch == '&'&&a[j + 1] == '&')
+		{
+			printf("<25,->,");
+			j += 2;
+		}
+		else if (ch == '|'&&a[j + 1] == '|')
+		{
+			printf("<26,->,");
+			j += 2;
+		}
+		else {
+			switch (ch) {
+			case '+':
+				printf("<14,->,");
+				break;
+			case '-':
+				printf("<15,->,");
+				break;
+			case '*':
+				printf("<16,->,");
+				break;
+			case '/':
+				printf("<17,->,");
+				break;
+			case '%':
+				printf("<18,->,");
+				break;
+			case '<':
+				printf("<19,->,");
+				break;
+			case '>':
+				printf("<21,->,");
+				break;
+			case '=':
+				printf("<27,->,");
+				break;
+			case '(':
+				printf("<28,->,");
+				break;
+			case ')':
+				printf("<29,->,");
+				break;
+			case '[':
+				printf("<30,->,");
+				break;
+			case ']':
+				printf("<31,->,");
+				break;
+			case '{':
+				printf("<32,->,");
+				break;
+			case '}':
+				printf("<33,->,");
+				break;
+			case ';':
+				printf("<34,->,");
+				break;
+			case ',':
+				printf("<35,->,");
+				break;
+			}
+			j++;
+		}
+	}
+	if (Error!= 0) {
+		printf("LexicalError(s) on line(s) ");
+		for (int i = 0; i <Error ; i++) {
+			printf("%d,", ErrorLine[i]);
+		}
+	}
+}
+int main() {
+
+	char a[10000];
+	int i=0;
+	do {
+		a[i] = getchar();
+		i++;
+	} while (a[i - 1] != '#');
+        Lexicalanalysis(a);
+	return 0;
+}
+
+
+
+
+
+
